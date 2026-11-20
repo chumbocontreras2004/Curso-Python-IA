@@ -7,7 +7,10 @@ def factorial(n: int) -> int:
     >>> factorial(5), factorial(0)
     (120, 1)
     """
-    raise NotImplementedError
+    resultado = 1
+    for factor in range(2, n + 1):
+        resultado *= factor
+    return resultado
 
 
 def es_primo(n: int) -> bool:
@@ -16,7 +19,12 @@ def es_primo(n: int) -> bool:
     >>> es_primo(13), es_primo(15), es_primo(1)
     (True, False, False)
     """
-    raise NotImplementedError
+    if n < 2:
+        return False
+    for divisor in range(2, n):
+        if n % divisor == 0:
+            return False
+    return True
 
 
 def invertir(texto: str) -> str:
@@ -25,7 +33,10 @@ def invertir(texto: str) -> str:
     >>> invertir("Python")
     'nohtyP'
     """
-    raise NotImplementedError
+    caracteres = []
+    for indice in range(len(texto) - 1, -1, -1):
+        caracteres.append(texto[indice])
+    return "".join(caracteres)
 
 
 def contar_vocales(texto: str) -> int:
@@ -34,7 +45,12 @@ def contar_vocales(texto: str) -> int:
     >>> contar_vocales("Programación")
     5
     """
-    raise NotImplementedError
+    vocales = "aeiouáéíóúü"
+    total = 0
+    for caracter in texto.lower():
+        if caracter in vocales:
+            total += 1
+    return total
 
 
 def suma_digitos(numero: int) -> int:
@@ -43,7 +59,12 @@ def suma_digitos(numero: int) -> int:
     >>> suma_digitos(1234), suma_digitos(-905)
     (10, 14)
     """
-    raise NotImplementedError
+    numero = abs(numero)
+    suma = 0
+    while numero > 0:
+        numero, digito = divmod(numero, 10)
+        suma += digito
+    return suma
 
 
 def fizzbuzz(n: int) -> str:
@@ -55,7 +76,17 @@ def fizzbuzz(n: int) -> str:
     >>> fizzbuzz(5)
     '1 2 Fizz 4 Buzz'
     """
-    raise NotImplementedError
+    resultados = []
+    for numero in range(1, n + 1):
+        if numero % 3 == 0 and numero % 5 == 0:
+            resultados.append("FizzBuzz")
+        elif numero % 3 == 0:
+            resultados.append("Fizz")
+        elif numero % 5 == 0:
+            resultados.append("Buzz")
+        else:
+            resultados.append(str(numero))
+    return " ".join(resultados)
 
 
 def tabla_multiplicar(numero: int) -> str:
@@ -64,7 +95,10 @@ def tabla_multiplicar(numero: int) -> str:
     >>> print(tabla_multiplicar(7).splitlines()[2])
     7 x  3 =  21
     """
-    raise NotImplementedError
+    lineas = []
+    for factor in range(1, 11):
+        lineas.append(f"{numero} x {factor:2d} = {numero * factor:3d}")
+    return "\n".join(lineas)
 
 
 def primer_multiplo_comun(a: int, b: int) -> int:
@@ -73,4 +107,7 @@ def primer_multiplo_comun(a: int, b: int) -> int:
     >>> primer_multiplo_comun(4, 6)
     12
     """
-    raise NotImplementedError
+    multiplo = a
+    while multiplo % b != 0:
+        multiplo += a
+    return multiplo
