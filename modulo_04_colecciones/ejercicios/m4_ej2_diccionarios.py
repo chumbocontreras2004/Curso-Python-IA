@@ -3,6 +3,8 @@
 Parte de los ejercicios de estudiantes y carrito del curso anterior.
 """
 
+from collections import Counter
+
 
 def punto_medio(a: tuple[float, float], b: tuple[float, float]) -> tuple[float, float]:
     """Devuelve el punto medio entre dos puntos (x, y).
@@ -10,7 +12,7 @@ def punto_medio(a: tuple[float, float], b: tuple[float, float]) -> tuple[float, 
     >>> punto_medio((0, 0), (4, 2))
     (2.0, 1.0)
     """
-    raise NotImplementedError
+    return ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
 
 
 def contar_palabras(texto: str) -> dict[str, int]:
@@ -19,7 +21,7 @@ def contar_palabras(texto: str) -> dict[str, int]:
     >>> contar_palabras("El gato y el perro")
     {'el': 2, 'gato': 1, 'y': 1, 'perro': 1}
     """
-    raise NotImplementedError
+    return dict(Counter(texto.lower().split()))
     # Con la librería estándar: dict(Counter(texto.lower().split()))
 
 
@@ -29,7 +31,7 @@ def invertir(diccionario: dict) -> dict:
     >>> invertir({"a": 1, "b": 2})
     {1: 'a', 2: 'b'}
     """
-    raise NotImplementedError
+    return {valor: clave for clave, valor in diccionario.items()}
 
 
 def notas_medias(estudiantes: dict[str, list[float]]) -> dict[str, float]:
@@ -41,7 +43,7 @@ def notas_medias(estudiantes: dict[str, list[float]]) -> dict[str, float]:
     >>> notas_medias({"Ada": [9, 10], "Linus": [5, 6, 8]})
     {'Ada': 9.5, 'Linus': 6.33}
     """
-    raise NotImplementedError
+    return {nombre: round(sum(notas) / len(notas), 2) if notas else 0.0 for nombre, notas in estudiantes.items()}
 
 
 def mejor_estudiante(estudiantes: dict[str, list[float]]) -> str | None:
@@ -53,7 +55,8 @@ def mejor_estudiante(estudiantes: dict[str, list[float]]) -> str | None:
     >>> mejor_estudiante({"Ada": [9, 10], "Linus": [5, 6, 8]})
     'Ada'
     """
-    raise NotImplementedError
+    medias = notas_medias(estudiantes)
+    return max(medias, key=lambda nombre: medias[nombre], default=None)
 
 
 def total_carrito(carrito: list[tuple[str, int, float]]) -> float:
@@ -64,7 +67,7 @@ def total_carrito(carrito: list[tuple[str, int, float]]) -> float:
     >>> total_carrito([("teclado", 2, 45.0), ("raton", 1, 19.9)])
     109.9
     """
-    raise NotImplementedError
+    return round(sum(unidades * precio for _, unidades, precio in carrito), 2)
 
 
 def fusionar_inventarios(a: dict[str, int], b: dict[str, int]) -> dict[str, int]:
@@ -75,7 +78,7 @@ def fusionar_inventarios(a: dict[str, int], b: dict[str, int]) -> dict[str, int]
     >>> fusionar_inventarios({"teclado": 5, "raton": 2}, {"raton": 3, "monitor": 1})
     {'teclado': 5, 'raton': 5, 'monitor': 1}
     """
-    raise NotImplementedError
+    return {clave: a.get(clave, 0) + b.get(clave, 0) for clave in set(a) | set(b)}
 
 
 def valor_anidado(datos: dict, ruta: str, por_defecto=None):
@@ -91,4 +94,9 @@ def valor_anidado(datos: dict, ruta: str, por_defecto=None):
     >>> valor_anidado(pedido, "cliente.telefono", "sin datos")
     'sin datos'
     """
-    raise NotImplementedError
+    actual = datos
+    for clave in ruta.split("."):
+        if not isinstance(actual, dict) or clave not in actual:
+            return por_defecto
+        actual = actual[clave]
+    return actual

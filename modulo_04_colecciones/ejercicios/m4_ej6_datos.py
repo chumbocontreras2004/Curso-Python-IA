@@ -14,22 +14,22 @@ Ninguna función modifica la lista que recibe.
 
 def buscar_por_id(registros: list[dict], identificador: int) -> dict | None:
     """Devuelve el registro cuyo campo "id" coincide, o ``None`` si no existe."""
-    raise NotImplementedError
+    return next((registro for registro in registros if registro.get("id") == identificador), None)
 
 
 def nombres(registros: list[dict]) -> list[str]:
     """Devuelve la lista con el campo "nombre" de cada registro, en el mismo orden."""
-    raise NotImplementedError
+    return [registro.get("nombre") for registro in registros]
 
 
 def filtrar(registros: list[dict], campo: str, valor) -> list[dict]:
     """Devuelve los registros en los que ``campo`` vale ``valor``."""
-    raise NotImplementedError
+    return [registro for registro in registros if registro.get(campo) == valor]
 
 
 def ordenar_por(registros: list[dict], campo: str, descendente: bool = False) -> list[dict]:
     """Devuelve una lista nueva con los registros ordenados por ``campo``."""
-    raise NotImplementedError
+    return sorted(registros, key=lambda registro: registro.get(campo), reverse=descendente)
 
 
 def mejor_pagados(registros: list[dict], cantidad: int = 3) -> list[str]:
@@ -37,7 +37,11 @@ def mejor_pagados(registros: list[dict], cantidad: int = 3) -> list[str]:
 
     De mayor a menor salario. A igual salario, por orden alfabético de nombre.
     """
-    raise NotImplementedError
+    mejores = sorted(
+        registros,
+        key=lambda registro: (-registro.get("salario", 0), registro.get("nombre", "")),
+    )
+    return [registro.get("nombre") for registro in mejores[:max(0, cantidad)]]
 
 
 def agrupar_por(registros: list[dict], campo: str) -> dict[str, list[dict]]:
@@ -46,12 +50,20 @@ def agrupar_por(registros: list[dict], campo: str) -> dict[str, list[dict]]:
     Devuelve un diccionario que asocia cada valor distinto del campo con la
     lista de registros que lo tienen, en su orden original.
     """
-    raise NotImplementedError
+    return {
+        valor: [registro for registro in registros if registro.get(campo) == valor]
+        for valor in dict.fromkeys(registro.get(campo) for registro in registros)
+    }
 
 
 def salario_medio_por_departamento(registros: list[dict]) -> dict[str, float]:
     """Devuelve el salario medio de cada departamento, con dos decimales."""
-    raise NotImplementedError
+    return {
+        departamento: round(
+            sum(registro.get("salario", 0) for registro in grupo) / len(grupo), 2
+        )
+        for departamento, grupo in agrupar_por(registros, "departamento").items()
+    }
 
 
 def emparejar(claves: list[str], filas: list[list]) -> list[dict]:
@@ -62,4 +74,4 @@ def emparejar(claves: list[str], filas: list[list]) -> list[dict]:
     >>> emparejar(["id", "nombre"], [[1, "Ada"], [2, "Linus"]])
     [{'id': 1, 'nombre': 'Ada'}, {'id': 2, 'nombre': 'Linus'}]
     """
-    raise NotImplementedError
+    return [dict(zip(claves, fila)) for fila in filas]
