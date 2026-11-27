@@ -18,12 +18,16 @@ def crear_dataframe(ventas: list[dict]) -> pd.DataFrame:
     >>> df.loc[0, "fecha"].year
     2026
     """
-    raise NotImplementedError
+    df = pd.DataFrame(ventas)
+    df["fecha"] = pd.to_datetime(df["fecha"], format="%Y-%m-%d", errors="raise")
+    return df
 
 
 def cargar_ventas(ruta: str | Path) -> pd.DataFrame:
     """Lee un CSV de ventas en UTF-8 y devuelve el DataFrame con ``fecha`` como fecha."""
-    raise NotImplementedError
+    df = pd.read_csv(ruta, encoding="utf-8")
+    df["fecha"] = pd.to_datetime(df["fecha"], format="%Y-%m-%d", errors="coerce")
+    return df
 
 
 def con_importe(df: pd.DataFrame) -> pd.DataFrame:
@@ -31,7 +35,9 @@ def con_importe(df: pd.DataFrame) -> pd.DataFrame:
 
     El DataFrame original no cambia.
     """
-    raise NotImplementedError
+    resultado = df.copy()
+    resultado["importe"] = resultado["unidades"] * resultado["precio"]
+    return resultado
 
 
 def resumen(df: pd.DataFrame) -> dict:
@@ -40,12 +46,18 @@ def resumen(df: pd.DataFrame) -> dict:
     Claves: "filas" (int), "columnas" (lista de nombres), "desde" y "hasta"
     (primera y última fecha, como texto "AAAA-MM-DD") y "unidades" (int, total).
     """
-    raise NotImplementedError
+    return {
+        "filas": int(len(df)),
+        "columnas": list(df.columns),
+        "desde": df["fecha"].min().strftime("%Y-%m-%d"),
+        "hasta": df["fecha"].max().strftime("%Y-%m-%d"),
+        "unidades": int(df["unidades"].sum()),
+    }
 
 
 def ventas_de(df: pd.DataFrame, vendedor: str) -> pd.DataFrame:
     """Devuelve las filas de un vendedor."""
-    raise NotImplementedError
+    return df.loc[df["vendedor"] == vendedor].copy()
 
 
 def filtrar(df: pd.DataFrame, *, region: str | None = None, categorias: list[str] | None = None,
@@ -56,7 +68,13 @@ def filtrar(df: pd.DataFrame, *, region: str | None = None, categorias: list[str
     - ``categorias``: si no es ``None``, solo las categorías de la lista.
     - ``unidades_minimas``: solo ventas con al menos esas unidades.
     """
-    raise NotImplementedError
+    mascara = pd.Series(True, index=df.index)
+    if region is not None:
+        mascara &= df["region"] == region
+    if categorias is not None:
+        mascara &= df["categoria"].isin(categorias)
+    mascara &= df["unidades"] >= unidades_minimas
+    return df.loc[mascara].copy()
 
 
 def mayores_ventas(df: pd.DataFrame, n: int = 3) -> pd.DataFrame:
@@ -64,14 +82,17 @@ def mayores_ventas(df: pd.DataFrame, n: int = 3) -> pd.DataFrame:
 
     El resultado tiene solo las columnas fecha, vendedor, producto e importe.
     """
-    raise NotImplementedError
+    with_importe = con_importe(df)
+    columnas = ["fecha", "vendedor", "producto", "importe"]
+    return with_importe.nlargest(n, "importe")[columnas].copy()
 
 
 def productos(df: pd.DataFrame) -> list[str]:
     """Devuelve la lista de productos distintos, en orden alfabético."""
-    raise NotImplementedError
+    return sorted(df["producto"].dropna().unique().tolist())
 
 
 def precio_medio_por_categoria(df: pd.DataFrame) -> dict[str, float]:
     """Devuelve el precio unitario medio de cada categoría, redondeado a dos decimales."""
-    raise NotImplementedError
+    medias = df.groupby("categoria", sort=True)["precio"].mean()
+    return {categoria: round(float(precio), 2) for categoria, precio in medias.items()}
